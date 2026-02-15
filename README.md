@@ -1,2 +1,3 @@
-# notes-app
-Exported from Caffeine project: Notes App
+## Notes App
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`

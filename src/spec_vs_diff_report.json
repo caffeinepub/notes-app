@@ -1,0 +1,132 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-15T23:41:15.978Z",
+  "summary": "Diff implements a substantial portion of the notes app: Internet Identity gating UI, notes dashboard with search, note cards + modals, frontend encryption/decryption helpers, .txt import utility, image validation + previews, and a fullscreen image modal. However, several requirements cannot be confirmed from the truncated backend and UI code (notably backend persistence/isolation details, image blob ownership + deletion, and encrypted-note edit blocking). Also, user profile/setup and admin-token access-control initialization appear to be added beyond the BuildRequest.",
+  "missing_requirements": [
+    {
+      "id": "REQ-2",
+      "requirement": "Create backend storage for per-user notes with strict per-caller data isolation; each note must include: unique note id, title, content, encryption status, creation timestamp, and references to any attached images; and persist across refreshes/calls.",
+      "reason": "Backend file is truncated; cannot verify that notes are actually stored in stable/persistent state, that per-caller isolation is enforced in all CRUD paths, or that storage is not accidentally using a non-var/immutable structure (e.g., `let emptyNotesMap = ...` shown).",
+      "evidence": [
+        "backend/main.mo (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Implement note CRUD operations end-to-end (create, list, view, update, delete).",
+      "reason": "Frontend hooks call update/delete/create, and backend shows list/get/create signatures, but backend implementation is truncated so update/delete and full end-to-end behavior cannot be confirmed.",
+      "evidence": [
+        "backend/main.mo (truncated)",
+        "frontend/src/hooks/useNotes.ts"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Store uploaded images in backend blob storage associated with the authenticated user, and display images in the note detail modal; enforce that a user cannot fetch another user’s images.",
+      "reason": "Frontend has image validation and preview utilities and a fullscreen modal, but the diff does not clearly show backend image upload/retrieval endpoints, ownership enforcement, or note detail modal rendering of images from backend (note detail modal is truncated).",
+      "evidence": [
+        "backend/main.mo (truncated)",
+        "frontend/src/components/NoteFormModal.tsx (truncated)",
+        "frontend/src/components/NoteDetailModal.tsx (truncated)",
+        "frontend/src/utils/imageAttachments.ts"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "requirement": "Image management during editing: keep existing images unless explicitly deleted; deleted images must be removed from backend storage and no longer retrievable.",
+      "reason": "Frontend form shows ability to remove existing images from local state (`handleRemoveExistingImage`), but backend-side deletion of blobs and enforcement that deleted images are no longer retrievable cannot be verified from truncated backend and truncated save/update logic.",
+      "evidence": [
+        "frontend/src/components/NoteFormModal.tsx (truncated)",
+        "backend/main.mo (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "requirement": "Provide a UI choice between manual text entry and .txt import in the create-note form, with non-.txt rejection and editable imported content.",
+      "reason": "There is a `useTextImport` state and `readTextFile` utility, but the NoteFormModal UI is truncated so the explicit UI toggle/choice between manual entry vs import cannot be confirmed.",
+      "evidence": [
+        "frontend/src/components/NoteFormModal.tsx (truncated)",
+        "frontend/src/utils/txtImport.ts"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "requirement": "When encryption is enabled, require password + confirmation before saving and block save until they match; store only ciphertext in backend; show ciphertext section in note card and detail; provide password prompt to decrypt for viewing.",
+      "reason": "Ciphertext display in NoteCard is implemented, and NoteDetailModal shows decrypt prompt + ciphertext section, but NoteFormModal save-time behavior (toggle, password+confirm enforcement, and storing ciphertext only when enabled) is truncated and cannot be fully verified.",
+      "evidence": [
+        "frontend/src/components/NoteCard.tsx",
+        "frontend/src/components/NoteDetailModal.tsx (truncated)",
+        "frontend/src/components/NoteFormModal.tsx (truncated)",
+        "frontend/src/utils/cryptoNotes.ts"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "requirement": "Editing an encrypted note must be blocked entirely unless the correct password is provided; with incorrect/missing password user cannot edit title/content/images or save.",
+      "reason": "NoteFormModal includes `handleDecryptForEdit` and `isDecrypted` state, but the truncated file does not show that all fields (title/content/images) and save controls are disabled until successful decrypt, nor that incorrect/missing password fully blocks editing.",
+      "evidence": [
+        "frontend/src/components/NoteFormModal.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "requirement": "Add generated static images under frontend/public/assets/generated (logo and empty-state illustration) and render them in the UI where appropriate.",
+      "reason": "UI references `/assets/generated/notes-logo.dim_512x512.png`, but the diff does not show the actual image files being added, and the required empty-state illustration file is not evidenced in the added file list (omitted files list does not confirm these specific assets).",
+      "evidence": [
+        "frontend/src/screens/LoginScreen.tsx",
+        "frontend/src/screens/NotesDashboard.tsx (truncated)"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "User profile creation/setup flow (ProfileSetupModal) and backend user profile APIs (get/save profile).",
+      "reason": "BuildRequest does not request user profiles or a name-collection onboarding modal; it only specifies notes, auth gate, images, import, search, encryption.",
+      "evidence": [
+        "frontend/src/components/ProfileSetupModal.tsx",
+        "frontend/src/App.tsx",
+        "frontend/src/hooks/useUserProfile.ts",
+        "backend/main.mo (truncated)"
+      ]
+    },
+    {
+      "description": "Admin-token/secret-based access control initialization via URL parameter `caffeineAdminToken` and `_initializeAccessControlWithSecret`.",
+      "reason": "BuildRequest specifies Internet Identity only and does not mention admin tokens, secret URL parameters, or extra access-control bootstrapping.",
+      "evidence": [
+        "frontend/src/hooks/useActor.ts",
+        "frontend/src/utils/urlParams.ts (truncated)",
+        "backend/main.mo (truncated)"
+      ]
+    }
+  ],
+  "confidence": 0.62,
+  "changed_files": [
+    "all_files_summary.json",
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/index.css",
+    "frontend/index.html",
+    "frontend/src/App.tsx",
+    "frontend/src/components/FullScreenImageModal.tsx",
+    "frontend/src/components/NoteCard.tsx",
+    "frontend/src/components/NoteDetailModal.tsx",
+    "frontend/src/components/NoteFormModal.tsx",
+    "frontend/src/components/ProfileSetupModal.tsx",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/hooks/useNotes.ts",
+    "frontend/src/hooks/useUserProfile.ts",
+    "frontend/src/index.css",
+    "frontend/src/main.tsx",
+    "frontend/src/screens/LoginScreen.tsx",
+    "frontend/src/screens/NotesDashboard.tsx",
+    "frontend/src/utils/cryptoNotes.ts",
+    "frontend/src/utils/imageAttachments.ts",
+    "frontend/src/utils/noteSearch.ts",
+    "frontend/src/utils/txtImport.ts",
+    "frontend/src/utils/urlParams.ts",
+    "frontend/tailwind.config.js",
+    "project_state.json"
+  ]
+}

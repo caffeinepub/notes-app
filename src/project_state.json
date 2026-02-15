@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Notes App: an Internet Identity–authenticated personal notes application with private per-user notes, image attachments, .txt import, real-time search, and optional frontend password encryption; dark-theme UI with card-based notes list and modal detail/image viewing.",
+  "architectural_notes": [
+    "Use Internet Identity for authentication; gate all note/image operations behind auth.",
+    "Perform password encryption/decryption on the frontend; backend stores only encrypted content without password knowledge.",
+    "Store images in blob storage and associate all blobs/notes with the authenticated user identity for isolation.",
+    "Implement real-time search on the frontend using locally loaded notes data.",
+    "UI is dark-theme only; note list uses card layout with CSS ellipsis title truncation and persistent edit/delete button visibility.",
+    "Detail view uses a modal; images open into a separate full-screen modal with click-outside/close-button dismissal."
+  ],
+  "known_issues": [
+    "Build/start pipeline hit a temporary internal platform error during initial build attempt; user requested retry."
+  ],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Minimal monochrome notebook logo mark, dark-theme friendly (notes-logo.dim_512x512.png)\n- Dark-themed empty-state illustration with a notebook and subtle texture (empty-state-illustration.dim_1200x600.png)",
+  "existing_features": [
+    {
+      "id": "feature-implement-an-internet-identity-authentication-gate-so-only-authenticated-users-can-access-the-app-unauthenticated-users-must-see-a-dedicated-login-screen-and-cannot-view-create-edit-delete-notes-or-upload-view-images",
+      "title": "Implement an Internet Identity authentication gate so only authenticated users can access the app; unauthenticated users must see a dedicated login screen and cannot view, create, edit, delete notes or upload/view images.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-note-crud-operations-end-to-end-create-list-view-detail-update-and-delete-notes-for-the-authenticated-user",
+      "title": "Implement note CRUD operations end-to-end: create, list, view (detail), update, and delete notes for the authenticated user.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-image-attachment-support-for-notes-allow-uploading-common-image-formats-jpeg-png-gif-show-immediate-real-image-previews-after-selection-store-images-in-backend-blob-storage-associated-with-the-authenticated-user-and-display-images-in-the-note-detail-modal",
+      "title": "Add image attachment support for notes: allow uploading common image formats (JPEG, PNG, GIF), show immediate real image previews after selection, store images in backend blob storage associated with the authenticated user, and display images in the note detail modal.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-image-management-during-editing-so-users-can-keep-existing-images-and-add-new-ones-existing-images-must-remain-unless-explicitly-deleted-by-the-user-and-deleted-images-must-be-removed-from-the-backend-storage-for-that-note-user",
+      "title": "Implement image management during editing so users can keep existing images and add new ones; existing images must remain unless explicitly deleted by the user, and deleted images must be removed from the backend storage for that note/user.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-full-screen-image-viewing-in-the-note-detail-modal-clicking-an-image-opens-a-full-screen-modal-showing-the-image-at-full-size-with-close-behavior-via-close-button-and-by-clicking-outside-the-image-and-smooth-navigation-back-to-the-note-detail-modal",
+      "title": "Add full-screen image viewing: in the note detail modal, clicking an image opens a full-screen modal showing the image at full size, with close behavior via close button and by clicking outside the image, and smooth navigation back to the note detail modal.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-txt-file-import-for-note-creation-provide-a-ui-choice-between-manual-text-entry-and-file-import-when-a-txt-file-is-selected-read-its-contents-on-the-frontend-and-populate-the-note-content-field-and-allow-the-user-to-edit-the-imported-text-before-saving",
+      "title": "Implement .txt file import for note creation: provide a UI choice between manual text entry and file import; when a .txt file is selected, read its contents on the frontend and populate the note content field, and allow the user to edit the imported text before saving.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-optional-password-based-encryption-for-note-contents-performed-on-the-frontend-when-enabled-during-creation-editing-require-password-confirmation-before-saving-store-only-ciphertext-in-the-backend-along-with-encryption-status-decrypt-on-the-frontend-only-when-the-correct-password-is-provided-display-ciphertext-as-proof-of-encryption-in-both-the-note-card-and-note-detail-view-alongside-the-title",
+      "title": "Add optional password-based encryption for note contents performed on the frontend: when enabled during creation/editing, require password + confirmation before saving; store only ciphertext in the backend along with encryption status; decrypt on the frontend only when the correct password is provided; display ciphertext as proof of encryption in both the note card and note detail view alongside the title.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enforce-encrypted-note-editing-rules-editing-an-encrypted-note-must-be-blocked-entirely-unless-the-user-provides-the-correct-password-if-password-is-incorrect-or-missing-the-user-cannot-edit-any-fields-including-title-and-images-and-cannot-save-changes",
+      "title": "Enforce encrypted-note editing rules: editing an encrypted note must be blocked entirely unless the user provides the correct password; if password is incorrect or missing, the user cannot edit any fields (including title and images) and cannot save changes.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-real-time-search-on-the-frontend-that-filters-the-locally-loaded-notes-list-by-title-or-content-as-the-user-types-with-a-clear-search-control-that-restores-the-full-list",
+      "title": "Implement real-time search on the frontend that filters the locally loaded notes list by title or content as the user types, with a clear-search control that restores the full list.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-specified-ui-structure-with-modals-main-dashboard-with-a-card-based-notes-list-and-search-at-top-clickable-note-cards-open-a-detailed-view-modal-modal-close-returns-to-the-notes-list-provide-create-and-edit-forms-with-required-fields-and-behaviors",
+      "title": "Implement the specified UI structure with modals: main dashboard with a card-based notes list and search at top; clickable note cards open a detailed view modal; modal close returns to the notes list; provide create and edit forms with required fields and behaviors.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-consistent-dark-theme-only-visual-design-across-the-entire-app-no-light-theme-toggle-ensure-responsive-note-card-layout-and-enforce-note-card-styling-requirements-truncate-long-titles-with-ellipsis-and-keep-edit-delete-controls-fully-visible-and-clickable-regardless-of-title-length",
+      "title": "Apply a consistent dark-theme-only visual design across the entire app (no light theme toggle), ensure responsive note card layout, and enforce note-card styling requirements: truncate long titles with ellipsis and keep edit/delete controls fully visible and clickable regardless of title length.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-establish-a-coherent-dark-visual-theme-direction-colors-typography-component-styling-with-a-distinct-style-that-fits-a-personal-notes-app-and-apply-it-consistently-across-all-pages-and-modals-avoid-blue-purple-as-primary-accents",
+      "title": "Establish a coherent dark visual theme direction (colors, typography, component styling) with a distinct style that fits a personal notes app and apply it consistently across all pages and modals (avoid blue/purple as primary accents).",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-if-new-static-images-are-generated-logo-illustrations-add-them-under-frontend-public-assets-generated-and-render-them-in-the-ui-where-appropriate-e-g-app-header-empty-state-without-serving-them-through-the-backend",
+      "title": "If new static images are generated (logo/illustrations), add them under frontend/public/assets/generated and render them in the UI where appropriate (e.g., app header/empty state) without serving them through the backend.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Internet Identity authentication gate; only authenticated users can access private notes/images with per-user data isolation",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Note management CRUD: create/view/edit/delete notes with title, content, timestamps, and per-user association; list shown as clickable cards with detail modal",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Image attachment upload, preview, and viewing: support JPEG/PNG/GIF; show immediate previews; note detail modal with full-screen image modal; keep old images unless explicitly deleted",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": ".txt file import for note content during creation (populate content field; user can edit before saving; choose manual entry vs file import)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Optional frontend password encryption for note contents: encrypt before sending to backend; decrypt on frontend with correct password; show title + ciphertext as proof; block editing entirely without correct password",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Frontend real-time search notes by title/content with clear search (filters locally loaded notes)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Dark-theme-only UI styling with responsive note cards; truncate long titles with ellipsis; ensure edit/delete buttons remain visible/clickable",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Backend storage operations for authenticated users: store/retrieve/update/delete notes and associated images; image storage via blob storage; serve images only to owner",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Create backend storage for per-user notes with strict per-caller data isolation; each note must include: unique note id, title, content (plain text or ciphertext), encryption status, creation timestamp, and references to any attached images.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Notes App",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

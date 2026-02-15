@@ -1,0 +1,293 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-implement-an-internet-identity-authentication-gate-so-only-authenticated-users-can-access-the-app-unauthenticated-users-must-see-a-dedicated-login-screen-and-cannot-view-create-edit-delete-notes-or-upload-view-images",
+      "featureTitle": "Implement an Internet Identity authentication gate so only authenticated users can access the app; unauthenticated users must see a dedicated login screen and cannot view, create, edit, delete notes or upload/view images.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/ProfileSetupModal.tsx",
+        "frontend/src/hooks/useUserProfile.ts",
+        "frontend/src/main.tsx",
+        "frontend/src/screens/LoginScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-note-crud-operations-end-to-end-create-list-view-detail-update-and-delete-notes-for-the-authenticated-user",
+      "featureTitle": "Implement note CRUD operations end-to-end: create, list, view (detail), update, and delete notes for the authenticated user.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/NoteCard.tsx",
+        "frontend/src/components/NoteDetailModal.tsx",
+        "frontend/src/components/NoteFormModal.tsx",
+        "frontend/src/hooks/useNotes.ts",
+        "frontend/src/screens/NotesDashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-image-attachment-support-for-notes-allow-uploading-common-image-formats-jpeg-png-gif-show-immediate-real-image-previews-after-selection-store-images-in-backend-blob-storage-associated-with-the-authenticated-user-and-display-images-in-the-note-detail-modal",
+      "featureTitle": "Add image attachment support for notes: allow uploading common image formats (JPEG, PNG, GIF), show immediate real image previews after selection, store images in backend blob storage associated with the authenticated user, and display images in the note detail modal.",
+      "files": [
+        "frontend/src/components/NoteDetailModal.tsx",
+        "frontend/src/components/NoteFormModal.tsx",
+        "frontend/src/utils/imageAttachments.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-image-management-during-editing-so-users-can-keep-existing-images-and-add-new-ones-existing-images-must-remain-unless-explicitly-deleted-by-the-user-and-deleted-images-must-be-removed-from-the-backend-storage-for-that-note-user",
+      "featureTitle": "Implement image management during editing so users can keep existing images and add new ones; existing images must remain unless explicitly deleted by the user, and deleted images must be removed from the backend storage for that note/user.",
+      "files": [
+        "frontend/src/components/NoteFormModal.tsx",
+        "frontend/src/utils/imageAttachments.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-full-screen-image-viewing-in-the-note-detail-modal-clicking-an-image-opens-a-full-screen-modal-showing-the-image-at-full-size-with-close-behavior-via-close-button-and-by-clicking-outside-the-image-and-smooth-navigation-back-to-the-note-detail-modal",
+      "featureTitle": "Add full-screen image viewing: in the note detail modal, clicking an image opens a full-screen modal showing the image at full size, with close behavior via close button and by clicking outside the image, and smooth navigation back to the note detail modal.",
+      "files": [
+        "frontend/src/components/FullScreenImageModal.tsx",
+        "frontend/src/components/NoteDetailModal.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-txt-file-import-for-note-creation-provide-a-ui-choice-between-manual-text-entry-and-file-import-when-a-txt-file-is-selected-read-its-contents-on-the-frontend-and-populate-the-note-content-field-and-allow-the-user-to-edit-the-imported-text-before-saving",
+      "featureTitle": "Implement .txt file import for note creation: provide a UI choice between manual text entry and file import; when a .txt file is selected, read its contents on the frontend and populate the note content field, and allow the user to edit the imported text before saving.",
+      "files": [
+        "frontend/src/components/NoteFormModal.tsx",
+        "frontend/src/utils/txtImport.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-optional-password-based-encryption-for-note-contents-performed-on-the-frontend-when-enabled-during-creation-editing-require-password-confirmation-before-saving-store-only-ciphertext-in-the-backend-along-with-encryption-status-decrypt-on-the-frontend-only-when-the-correct-password-is-provided-display-ciphertext-as-proof-of-encryption-in-both-the-note-card-and-note-detail-view-alongside-the-title",
+      "featureTitle": "Add optional password-based encryption for note contents performed on the frontend: when enabled during creation/editing, require password + confirmation before saving; store only ciphertext in the backend along with encryption status; decrypt on the frontend only when the correct password is provided; display ciphertext as proof of encryption in both the note card and note detail view alongside the title.",
+      "files": [
+        "frontend/src/components/NoteCard.tsx",
+        "frontend/src/components/NoteDetailModal.tsx",
+        "frontend/src/components/NoteFormModal.tsx",
+        "frontend/src/utils/cryptoNotes.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-enforce-encrypted-note-editing-rules-editing-an-encrypted-note-must-be-blocked-entirely-unless-the-user-provides-the-correct-password-if-password-is-incorrect-or-missing-the-user-cannot-edit-any-fields-including-title-and-images-and-cannot-save-changes",
+      "featureTitle": "Enforce encrypted-note editing rules: editing an encrypted note must be blocked entirely unless the user provides the correct password; if password is incorrect or missing, the user cannot edit any fields (including title and images) and cannot save changes.",
+      "files": [
+        "frontend/src/components/NoteFormModal.tsx",
+        "frontend/src/utils/cryptoNotes.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-9"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-real-time-search-on-the-frontend-that-filters-the-locally-loaded-notes-list-by-title-or-content-as-the-user-types-with-a-clear-search-control-that-restores-the-full-list",
+      "featureTitle": "Implement real-time search on the frontend that filters the locally loaded notes list by title or content as the user types, with a clear-search control that restores the full list.",
+      "files": [
+        "frontend/src/screens/NotesDashboard.tsx",
+        "frontend/src/utils/noteSearch.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-10"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-the-specified-ui-structure-with-modals-main-dashboard-with-a-card-based-notes-list-and-search-at-top-clickable-note-cards-open-a-detailed-view-modal-modal-close-returns-to-the-notes-list-provide-create-and-edit-forms-with-required-fields-and-behaviors",
+      "featureTitle": "Implement the specified UI structure with modals: main dashboard with a card-based notes list and search at top; clickable note cards open a detailed view modal; modal close returns to the notes list; provide create and edit forms with required fields and behaviors.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/NoteDetailModal.tsx",
+        "frontend/src/components/NoteFormModal.tsx",
+        "frontend/src/screens/NotesDashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-11"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-apply-a-consistent-dark-theme-only-visual-design-across-the-entire-app-no-light-theme-toggle-ensure-responsive-note-card-layout-and-enforce-note-card-styling-requirements-truncate-long-titles-with-ellipsis-and-keep-edit-delete-controls-fully-visible-and-clickable-regardless-of-title-length",
+      "featureTitle": "Apply a consistent dark-theme-only visual design across the entire app (no light theme toggle), ensure responsive note card layout, and enforce note-card styling requirements: truncate long titles with ellipsis and keep edit/delete controls fully visible and clickable regardless of title length.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/NoteCard.tsx",
+        "frontend/src/index.css",
+        "frontend/src/screens/NotesDashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-12"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-establish-a-coherent-dark-visual-theme-direction-colors-typography-component-styling-with-a-distinct-style-that-fits-a-personal-notes-app-and-apply-it-consistently-across-all-pages-and-modals-avoid-blue-purple-as-primary-accents",
+      "featureTitle": "Establish a coherent dark visual theme direction (colors, typography, component styling) with a distinct style that fits a personal notes app and apply it consistently across all pages and modals (avoid blue/purple as primary accents).",
+      "files": [
+        "frontend/src/components/NoteDetailModal.tsx",
+        "frontend/src/components/NoteFormModal.tsx",
+        "frontend/src/index.css"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-13"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-if-new-static-images-are-generated-logo-illustrations-add-them-under-frontend-public-assets-generated-and-render-them-in-the-ui-where-appropriate-e-g-app-header-empty-state-without-serving-them-through-the-backend",
+      "featureTitle": "If new static images are generated (logo/illustrations), add them under frontend/public/assets/generated and render them in the UI where appropriate (e.g., app header/empty state) without serving them through the backend.",
+      "files": [
+        "frontend/src/screens/LoginScreen.tsx",
+        "frontend/src/screens/NotesDashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-14"
+      ],
+      "confidence": "high"
+    }
+  ]
+}
