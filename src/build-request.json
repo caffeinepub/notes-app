@@ -1,329 +1,79 @@
 {
   "kind": "build_request",
-  "title": "Internet Identity Notes App with private notes, image attachments, .txt import, search, and optional frontend encryption",
-  "priority": "normal",
+  "title": "Fix fullscreen image preview dismissal bug (close button and backdrop click)",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Implement an Internet Identity authentication gate so only authenticated users can access the app; unauthenticated users must see a dedicated login screen and cannot view, create, edit, delete notes or upload/view images.",
-      "target": "both",
+      "text": "Fix the fullscreen image preview overlay so it can always be dismissed when viewing an attached image: (a) clicking the preview close (X) button must close the fullscreen preview, and (b) clicking the backdrop/outside the image must close the fullscreen preview.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Users must authenticate using Internet Identity before accessing the application",
-          "Only authenticated users can access their notes and upload images"
+          "The bug is still present"
         ]
       },
       "acceptanceCriteria": [
-        "When not authenticated, the user sees only a login screen with an Internet Identity sign-in action",
-        "After successful sign-in, the main notes dashboard loads",
-        "If the user signs out, the UI returns to the login screen and cached private data is cleared from view"
+        "From NoteDetailModal, open any attached image into the fullscreen preview and verify clicking the X button closes the fullscreen preview immediately.",
+        "From NoteDetailModal, open any attached image into the fullscreen preview and verify clicking the darkened backdrop area (outside the image) closes the fullscreen preview immediately.",
+        "Closing the fullscreen preview must not require multiple clicks and must work consistently across repeated open/close cycles."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Create backend storage for per-user notes with strict per-caller data isolation; each note must include: unique note id, title, content (plain text or ciphertext), encryption status, creation timestamp, and references to any attached images.",
-      "target": "backend",
+      "text": "Ensure the fullscreen image preview overlay is the topmost interactive layer while open, so pointer/click events reach the fullscreen preview close controls (i.e., underlying Dialog/overlays must not intercept clicks intended for the fullscreen preview).",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Backend stores all user notes with user identity association",
-          "Each note contains title, content (encrypted or plain text), creation timestamp, image references, and encryption status",
-          "Each user's notes and images are private and isolated from other users"
+          "The bug is still present"
         ]
       },
       "acceptanceCriteria": [
-        "Notes created by one principal are not visible/readable/listable by any other principal",
-        "Backend persists notes across page refreshes and canister calls",
-        "Each note record includes all required fields and returns them consistently in list/detail calls"
+        "While the fullscreen preview is open, clicking the X button triggers the fullscreen preview onClose behavior every time (no dead/unresponsive button).",
+        "While the fullscreen preview is open, clicking the backdrop triggers the fullscreen preview onClose behavior every time (no click-through to the underlying NoteDetailModal).",
+        "After closing the fullscreen preview, the underlying NoteDetailModal remains open and interactive."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Implement note CRUD operations end-to-end: create, list, view (detail), update, and delete notes for the authenticated user.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Create new notes with title, content, and optional image attachments",
-          "View a list of all personal notes displayed as clickable cards",
-          "Click on any note card to open a detailed view modal showing full note content and attached images",
-          "Edit existing notes to update title, content, and modify image attachments",
-          "Delete existing notes and their associated images"
-        ]
-      },
-      "acceptanceCriteria": [
-        "User can create a note and see it appear in the notes list without reloading the page",
-        "User can open a note detail modal from the list and close it to return to the list",
-        "User can update a note and see changes reflected in both list and detail views",
-        "User can delete a note and it is removed from the UI and backend storage"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Add image attachment support for notes: allow uploading common image formats (JPEG, PNG, GIF), show immediate real image previews after selection, store images in backend blob storage associated with the authenticated user, and display images in the note detail modal.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Support common image formats (JPEG, PNG, GIF)",
-          "Images are stored using blob storage system",
-          "Show actual image preview immediately after upload instead of placeholder icons or boxes",
-          "Display uploaded images within note detail modal"
-        ]
-      },
-      "acceptanceCriteria": [
-        "During create/edit, selecting image files shows thumbnail previews before saving",
-        "After saving a note, attached images can be loaded again from backend and displayed in the detail modal",
-        "Unsupported file types are rejected with a user-visible error message in English",
-        "A user cannot fetch another user’s images (backend enforces ownership)"
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Implement image management during editing so users can keep existing images and add new ones; existing images must remain unless explicitly deleted by the user, and deleted images must be removed from the backend storage for that note/user.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "users should be able to keep the old image and add new ones unless they explicitly delete it",
-          "Remove or replace images when editing notes"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Edit form shows currently attached images and allows marking individual images for deletion",
-        "Adding new images during edit does not remove existing images unless the user deletes them",
-        "Deleted images are no longer displayed after save and are no longer retrievable from backend for that user"
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Add full-screen image viewing: in the note detail modal, clicking an image opens a full-screen modal showing the image at full size, with close behavior via close button and by clicking outside the image, and smooth navigation back to the note detail modal.",
+      "text": "Verify and keep correct keyboard dismissal behavior: pressing Escape while the fullscreen image preview is open must close only the fullscreen preview overlay and must not close the underlying NoteDetailModal.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Click on any image in the note detail view to open it in a full-screen modal for viewing at full size",
-          "Full-screen image modal supports closing by clicking outside the image or using a close button",
-          "Navigate smoothly between full-screen image viewing and note detail view"
+          "The bug is still present"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking an image in note detail opens a full-screen overlay with the selected image",
-        "User can close the full-screen overlay via an explicit close button and by clicking the backdrop",
-        "After closing, the user returns to the note detail modal state (note remains open)"
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "text": "Implement .txt file import for note creation: provide a UI choice between manual text entry and file import; when a .txt file is selected, read its contents on the frontend and populate the note content field, and allow the user to edit the imported text before saving.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Content can be entered manually by typing or imported from a .txt file upload",
-          "When a .txt file is uploaded, its contents are automatically read and used as the note's content",
-          "Users can choose between manual text entry or file import when creating notes",
-          "Users can still manually edit the imported content before saving the note"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Create-note form offers an explicit selection between manual entry and .txt import",
-        "Selecting a .txt file populates the content field with file contents without requiring a page reload",
-        "User can edit the populated content prior to saving",
-        "Non-.txt files are rejected with a user-visible error message in English"
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "text": "Add optional password-based encryption for note contents performed on the frontend: when enabled during creation/editing, require password + confirmation before saving; store only ciphertext in the backend along with encryption status; decrypt on the frontend only when the correct password is provided; display ciphertext as proof of encryption in both the note card and note detail view alongside the title.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Option to encrypt note contents with a password during note creation and editing",
-          "When encryption is selected, users must enter and confirm a password before saving",
-          "Password encryption is performed on the frontend before sending data to backend",
-          "Decryption is performed on the frontend when the correct password is provided",
-          "For encrypted notes in the main notes list, should the note card show only the ciphertext, or should it show title + ciphertext?",
-          "title + ciphertext",
-          "For encrypted notes, display the ciphertext as a separate section in both note cards and detail view as proof of encryption"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When encryption is enabled, the UI shows password and confirm password fields and blocks save until they match",
-        "Backend stores ciphertext (not plaintext) when encryption is enabled, and the encryption status is persisted",
-        "In the notes list, encrypted notes show title plus a clearly labeled ciphertext section",
-        "In the note detail modal, encrypted notes show a ciphertext section and provide a password prompt to decrypt for viewing"
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "text": "Enforce encrypted-note editing rules: editing an encrypted note must be blocked entirely unless the user provides the correct password; if password is incorrect or missing, the user cannot edit any fields (including title and images) and cannot save changes.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "1 -  block editing entirely",
-          "For encrypted notes during editing, require password entry to decrypt and modify content"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Attempting to edit an encrypted note prompts for password before showing editable fields",
-        "With incorrect/missing password, the edit UI does not allow changing title/content/images and does not allow saving",
-        "With correct password, the note becomes editable and can be saved successfully"
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "text": "Implement real-time search on the frontend that filters the locally loaded notes list by title or content as the user types, with a clear-search control that restores the full list.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Real-time search that updates the displayed notes list as the user types",
-          "Search is performed on the frontend using locally loaded notes data",
-          "Clear search functionality to return to viewing all notes",
-          "Search input field prominently displayed on the main notes dashboard"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Typing in the search field filters visible notes immediately without additional backend calls",
-        "Search matches against both title and content/ciphertext depending on note type",
-        "Clear-search restores the full unfiltered list and clears the input"
-      ]
-    },
-    {
-      "id": "REQ-11",
-      "text": "Implement the specified UI structure with modals: main dashboard with a card-based notes list and search at top; clickable note cards open a detailed view modal; modal close returns to the notes list; provide create and edit forms with required fields and behaviors.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Main dashboard showing list of user's notes as clickable cards with search input field at the top",
-          "Detailed view modal that opens when clicking on a note card, displaying full content and attached images",
-          "Close the detailed view modal to return to the notes list",
-          "Form to create new notes with title, content fields, image upload capability, text file import option, and encryption toggle",
-          "Edit functionality for existing notes with pre-populated title, content fields, existing images, and encryption settings"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Notes list is rendered as clickable cards; clicking opens a modal with full note details",
-        "Create form supports title, content, attachments, import option, and encryption toggle",
-        "Edit form is pre-populated from the selected note and supports updating fields per the rules",
-        "All user-facing text is in English"
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "text": "Apply a consistent dark-theme-only visual design across the entire app (no light theme toggle), ensure responsive note card layout, and enforce note-card styling requirements: truncate long titles with ellipsis and keep edit/delete controls fully visible and clickable regardless of title length.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Clean and simple interface with consistent dark theme styling throughout the entire application",
-          "All backgrounds, text, and UI elements use a dark color palette",
-          "No light theme options or toggles available",
-          "Long note titles must be truncated with ellipsis using proper CSS properties (text-overflow: ellipsis, white-space: nowrap, overflow: hidden)",
-          "Edit and delete buttons must remain fully visible and clickable regardless of title length",
-          "Note card layout must remain responsive and consistent across different screen sizes"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The app uses a dark palette across all screens, dialogs, and components and does not provide a light theme option",
-        "Long titles in note cards truncate with ellipsis and do not overlap controls",
-        "Edit/delete buttons remain visible and clickable at all viewport sizes",
-        "Spacing/alignment within note cards remains consistent across different title lengths"
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "text": "Establish a coherent dark visual theme direction (colors, typography, component styling) with a distinct style that fits a personal notes app and apply it consistently across all pages and modals (avoid blue/purple as primary accents).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Clean and simple interface with consistent dark theme styling throughout the entire application"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A single, consistent theme is applied to dashboard, forms, and modals",
-        "Primary accent color is not blue or purple unless explicitly required by the user (not required here)",
-        "Typography and spacing choices are consistent across screens"
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "text": "If new static images are generated (logo/illustrations), add them under frontend/public/assets/generated and render them in the UI where appropriate (e.g., app header/empty state) without serving them through the backend.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Use English for any user-facing text in the build request."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Generated images are stored at frontend/public/assets/generated and referenced directly by the frontend",
-        "The app loads and displays the generated images without backend endpoints",
-        "All visible accompanying text remains in English"
+        "With the fullscreen preview open, pressing Escape closes the fullscreen preview.",
+        "After pressing Escape to close the fullscreen preview, the NoteDetailModal is still open (it does not dismiss).",
+        "With only the NoteDetailModal open (no fullscreen preview), pressing Escape continues to behave as it did previously for the NoteDetailModal."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services)",
-    "Do not edit files under frontend/src/components/ui or any frontend immutable paths; compose read-only components instead",
-    "Do not use third-party authentication providers other than Internet Identity",
-    "Do not use external databases or external storage services; persist data within the canister",
-    "Encryption/decryption must be performed on the frontend; backend must store ciphertext without knowledge of the password"
+    "Frontend changes must not edit files under frontend/src/components/ui (compose them instead).",
+    "Keep all user-facing text in English."
   ],
   "nonGoals": [
-    "Real-time collaboration or multi-user shared notes",
-    "WebSockets or real-time chat/push notifications",
-    "Integration with external email/SMS services",
-    "Integration with external AI/LLM services",
-    "Support for non-text imports beyond .txt (e.g., .docx, PDF)"
+    "Adding new note features unrelated to image preview dismissal.",
+    "Changing backend behavior or data models (this bug should be addressed in the frontend unless a clear backend cause is discovered)."
   ],
   "imageRequirements": {
-    "required": [
-      "Minimal monochrome notebook logo mark, dark-theme friendly (notes-logo.dim_512x512.png)",
-      "Dark-themed empty-state illustration with a notebook and subtle texture (empty-state-illustration.dim_1200x600.png)"
-    ],
+    "required": [],
     "edits": []
   },
   "userProfileUpdate": {
     "goalsToAdd": [],
     "goalsToRemove": [],
-    "preferencesToAdd": [
-      "User-facing text must be English"
-    ],
+    "preferencesToAdd": [],
     "preferencesToRemove": [],
     "miscToAdd": [],
     "miscToRemove": [],

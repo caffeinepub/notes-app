@@ -3,16 +3,17 @@
   "frontend/src/screens/LoginScreen.tsx": "Dedicated login screen with branding logo and Internet Identity sign-in button.",
   "frontend/src/screens/NotesDashboard.tsx": "Main dashboard displaying notes in a card grid with search functionality, create/edit/detail modals, header with user info and logout, and empty state with illustration.",
   "frontend/src/components/NoteCard.tsx": "Clickable note card component showing title, content preview (or ciphertext for encrypted notes), timestamp, image count, and always-visible edit/delete buttons with proper ellipsis truncation.",
-  "frontend/src/components/NoteDetailModal.tsx": "Modal displaying full note details with decryption UI for encrypted notes, attached images with click-to-fullscreen, and edit/delete actions.",
-  "frontend/src/components/NoteFormModal.tsx": "Create/edit note form modal with title, content, image attachments (with previews), .txt import option, and optional password encryption with validation.",
-  "frontend/src/components/FullScreenImageModal.tsx": "Full-screen image viewer modal with backdrop click and close button to return to note detail view.",
+  "frontend/src/components/NoteDetailModal.tsx": "Modal displaying full note details with explicit opaque background (bg-card), decryption UI for encrypted notes, attached images with click-to-fullscreen, edit/delete actions, preview-aware Dialog close handling that prevents the modal from closing when the fullscreen image preview is active, and conditional pointer-events-none class to disable underlying interactions while fullscreen preview is open.",
+  "frontend/src/components/NoteFormModal.tsx": "Create/edit note form modal with explicit opaque background (bg-card), title, content, image attachments with previews, .txt import option, optional password encryption with validation, actor readiness gating (disables submit until backend is initialized with inline loading indicator), and enhanced error diagnostics (console logging + user-friendly toast messages with reasons).",
+  "frontend/src/components/FullScreenImageModal.tsx": "Full-screen image viewer modal rendered in a portal at z-index 200 with explicit pointer event handling, stopImmediatePropagation on Escape key, type=\"button\" on close button, and comprehensive event isolation to prevent click-through to underlying layers.",
   "frontend/src/components/ProfileSetupModal.tsx": "First-login modal to capture user's name for profile creation, using showCloseButton={false} to prevent dismissal.",
   "frontend/src/hooks/useUserProfile.ts": "React Query hooks for fetching and saving user profile with proper actor dependency handling to prevent modal flash.",
-  "frontend/src/hooks/useNotes.ts": "React Query hooks for all note CRUD operations (list, get, create, update, delete) with automatic cache invalidation.",
+  "frontend/src/hooks/useNotes.ts": "React Query hooks for all note CRUD operations (list, get, create, update, delete) with automatic cache invalidation and mutation-level error logging for diagnostics.",
   "frontend/src/utils/imageAttachments.ts": "Utilities for validating image file types/sizes and creating preview URLs for selected images.",
   "frontend/src/utils/txtImport.ts": "Utility to read and validate .txt file contents for note content import.",
   "frontend/src/utils/cryptoNotes.ts": "Frontend password-based encryption/decryption using Web Crypto API with AES-GCM and PBKDF2 key derivation, with proper BufferSource typing for salt parameter.",
   "frontend/src/utils/noteSearch.ts": "Client-side note filtering utility for real-time search by title or content.",
   "frontend/src/index.css": "Global styles with dark-only OKLCH color system using teal/cyan accent (avoiding blue/purple) and Inter font family.",
-  "frontend/tailwind.config.js": "Tailwind configuration with Inter font family and extended color tokens matching the dark theme design system."
+  "frontend/tailwind.config.js": "Tailwind configuration with Inter font family and extended color tokens matching the dark theme design system.",
+  "frontend/src/utils/safeErrorReason.ts": "Utility function that extracts safe, UI-friendly error messages from unknown error objects, normalizing common patterns like \"Actor not available\" and authorization errors without exposing stack traces."
 }

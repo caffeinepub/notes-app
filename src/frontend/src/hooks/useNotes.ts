@@ -40,6 +40,10 @@ export function useCreateNote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
     },
+    onError: (error) => {
+      // Log mutation-level errors for diagnostics
+      console.error('Create note mutation error:', error);
+    },
   });
 }
 
@@ -55,6 +59,10 @@ export function useUpdateNote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
     },
+    onError: (error) => {
+      // Log mutation-level errors for diagnostics
+      console.error('Update note mutation error:', error);
+    },
   });
 }
 
@@ -69,6 +77,10 @@ export function useDeleteNote() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
+    },
+    onError: (error) => {
+      // Log mutation-level errors for diagnostics
+      console.error('Delete note mutation error:', error);
     },
   });
 }

@@ -1,369 +1,68 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "II Notes App (private notes, images, txt import, search, optional frontend encryption) — Frontend plan",
+  "title": "Fix fullscreen image preview dismissal and interaction layering",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Gate the entire UI behind Internet Identity login with a dedicated login screen; on logout, return to login and clear cached private data.",
+      "summary": "Make fullscreen image preview reliably dismissible via the close (X) button and by clicking the backdrop/outside the image.",
       "acceptanceCriteria": [
-        "When not authenticated, the user sees only a login screen with an Internet Identity sign-in action",
-        "After successful sign-in, the main notes dashboard loads",
-        "If the user signs out, the UI returns to the login screen and cached private data is cleared from view"
+        "From NoteDetailModal, open any attached image into the fullscreen preview and verify clicking the X button closes the fullscreen preview immediately.",
+        "From NoteDetailModal, open any attached image into the fullscreen preview and verify clicking the darkened backdrop area (outside the image) closes the fullscreen preview immediately.",
+        "Closing the fullscreen preview must not require multiple clicks and must work consistently across repeated open/close cycles."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
-          "operation": "create",
-          "description": "Create the top-level app shell that uses the authorization component’s Internet Identity flow (useInternetIdentity + useActor) to enforce an authenticated-only gate; render a dedicated LoginScreen when unauthenticated and the NotesDashboard when authenticated; on logout, clear all React Query cached data and reset any in-memory note/image state. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/main.tsx",
+          "path": "frontend/src/components/FullScreenImageModal.tsx",
           "operation": "modify",
-          "description": "Wire the new App.tsx implementation (keeps existing import) and ensure the QueryClientProvider + InternetIdentityProvider setup supports clearing cached data on logout from within the app shell. Verify the component's usage instructions before implementing."
+          "description": "Harden dismissal interactions: ensure the close (X) button always triggers onClose (e.g., explicit type=\"button\", stopPropagation on pointer events), and make backdrop dismissal robust by handling pointer-down/click only when the backdrop itself is targeted (no child clicks)."
         },
         {
-          "path": "frontend/src/screens/LoginScreen.tsx",
-          "operation": "create",
-          "description": "Implement the dedicated login screen (English text only) with an Internet Identity sign-in action, plus brief privacy copy; no notes/images UI should render here. Use the authorization component’s login/clear patterns. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/components/NoteDetailModal.tsx",
+          "operation": "modify",
+          "description": "Confirm the fullscreen preview onClose reliably clears selectedImage and that image thumbnail clicks consistently set selectedImage to open the fullscreen preview."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Ensure the fullscreen image preview overlay is the topmost interactive layer so underlying dialogs/overlays cannot intercept clicks.",
+      "acceptanceCriteria": [
+        "While the fullscreen preview is open, clicking the X button triggers the fullscreen preview onClose behavior every time (no dead/unresponsive button).",
+        "While the fullscreen preview is open, clicking the backdrop triggers the fullscreen preview onClose behavior every time (no click-through to the underlying NoteDetailModal).",
+        "After closing the fullscreen preview, the underlying NoteDetailModal remains open and interactive."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/FullScreenImageModal.tsx",
+          "operation": "modify",
+          "description": "Raise and stabilize overlay stacking and event handling: increase the modal/backdrop z-index to be above Radix/shadcn Dialog layers, ensure the overlay container receives pointer events, and prevent click-through by stopping propagation on the overlay root and controls."
         },
         {
-          "path": "frontend/src/hooks/useUserProfile.ts",
-          "operation": "create",
-          "description": "Add React Query hooks for getCallerUserProfile/saveCallerUserProfile to support first-login name capture and prevent modal flash as per the authorization component guidance. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/ProfileSetupModal.tsx",
-          "operation": "create",
-          "description": "Add a modal to collect a human-readable name on first login (using saveCallerUserProfile) and display the name in the app header thereafter; avoid showing principal id. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/components/NoteDetailModal.tsx",
+          "operation": "modify",
+          "description": "While fullscreen preview is open, optionally reduce/disable underlying DialogContent pointer events (e.g., conditional class) to guarantee clicks cannot be intercepted by the NoteDetailModal layer, without closing the dialog."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Implement authenticated user note CRUD in the UI: create, list, detail view modal, update, and delete, updating UI without reload.",
+      "summary": "Maintain correct keyboard dismissal: Escape closes only the fullscreen preview and does not close the underlying NoteDetailModal.",
       "acceptanceCriteria": [
-        "User can create a note and see it appear in the notes list without reloading the page",
-        "User can open a note detail modal from the list and close it to return to the list",
-        "User can update a note and see changes reflected in both list and detail views",
-        "User can delete a note and it is removed from the UI and backend storage"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useNotes.ts",
-          "operation": "create",
-          "description": "Create React Query hooks for listNotes/getNote/createNote/updateNote/deleteNote using the actor from useActor; handle loading/error states and map authorization failures to user-friendly English messages. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/screens/NotesDashboard.tsx",
-          "operation": "create",
-          "description": "Implement the main dashboard: header (logo, user name, logout), search input, create-note action, and a responsive grid of clickable NoteCard items sourced from locally loaded notes via useNotes hooks. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteCard.tsx",
-          "operation": "create",
-          "description": "Implement a clickable note card showing title and a content preview; include always-visible edit/delete controls; when encrypted, show title plus a clearly labeled ciphertext section (preview) rather than plaintext. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteDetailModal.tsx",
-          "operation": "create",
-          "description": "Implement the note detail modal opened from a NoteCard: show full content (or ciphertext + decrypt UI if encrypted) and attached images; include actions for edit/delete and close-to-return behavior. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteFormModal.tsx",
-          "operation": "create",
-          "description": "Implement a modal used for both create and edit forms with pre-population for editing; include required fields and integrate image attachments, .txt import option, and encryption toggle/password handling. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wire NotesDashboard, NoteDetailModal, and NoteFormModal into the authenticated flow: open detail modal on card click, open create/edit modal, and ensure close returns to the notes list without navigation glitches. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Support image attachments with client-side previews, validate types, upload/store via backend blob references, and display images in note detail.",
-      "acceptanceCriteria": [
-        "During create/edit, selecting image files shows thumbnail previews before saving",
-        "After saving a note, attached images can be loaded again from backend and displayed in the detail modal",
-        "Unsupported file types are rejected with a user-visible error message in English",
-        "A user cannot fetch another user’s images (backend enforces ownership)"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/utils/imageAttachments.ts",
-          "operation": "create",
-          "description": "Add helpers to validate allowed image MIME types (JPEG/PNG/GIF), generate preview object URLs for selected files, and convert selected files to blob-storage ExternalBlob objects for upload while tracking progress. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteFormModal.tsx",
-          "operation": "modify",
-          "description": "Add image selection UI for create/edit with immediate real thumbnail previews, per-file validation errors in English, and conversion of selected files to ExternalBlob references for saving with the note. Use the blob-storage component’s ExternalBlob capabilities (fromBytes, withUploadProgress). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteDetailModal.tsx",
-          "operation": "modify",
-          "description": "Render attached images loaded from note.imageRefs using ExternalBlob.getDirectURL for efficient display; ensure images appear as real images (not placeholders) and handle loading/fallback errors with English messaging. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Enable image management on edit: keep existing images by default, add new images, and allow explicit deletion of specific existing images.",
-      "acceptanceCriteria": [
-        "Edit form shows currently attached images and allows marking individual images for deletion",
-        "Adding new images during edit does not remove existing images unless the user deletes them",
-        "Deleted images are no longer displayed after save and are no longer retrievable from backend for that user"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/NoteFormModal.tsx",
-          "operation": "modify",
-          "description": "Extend edit mode to show currently attached images and allow marking each existing image for deletion; merge remaining existing images with new uploads on save; update UI state after save to reflect additions/removals. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/utils/imageAttachments.ts",
-          "operation": "modify",
-          "description": "Add utilities to manage a combined list of existing ExternalBlob refs and newly selected files, plus a deletion-marking model for existing images so the edit form can compute the final imageRefs list to save. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Add full-screen image viewing from the note detail modal with backdrop/click-outside and close button behavior.",
-      "acceptanceCriteria": [
-        "Clicking an image in note detail opens a full-screen overlay with the selected image",
-        "User can close the full-screen overlay via an explicit close button and by clicking the backdrop",
-        "After closing, the user returns to the note detail modal state (note remains open)"
+        "With the fullscreen preview open, pressing Escape closes the fullscreen preview.",
+        "After pressing Escape to close the fullscreen preview, the NoteDetailModal is still open (it does not dismiss).",
+        "With only the NoteDetailModal open (no fullscreen preview), pressing Escape continues to behave as it did previously for the NoteDetailModal."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/FullScreenImageModal.tsx",
-          "operation": "create",
-          "description": "Create a full-screen modal overlay component that displays a selected image at full size, supports close button and backdrop click, and preserves the underlying note detail modal state. Verify the component's usage instructions before implementing."
+          "operation": "modify",
+          "description": "Strengthen Escape interception so it consistently closes only the fullscreen preview: keep the keydown listener in capture phase and prevent downstream handlers (including any stopImmediatePropagation-compatible handling) from also acting on Escape."
         },
         {
           "path": "frontend/src/components/NoteDetailModal.tsx",
           "operation": "modify",
-          "description": "Wire image click handling to open FullScreenImageModal with the selected image; on close, return to the same note detail modal without losing scroll/selection context. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Implement .txt import option for note creation that reads file contents on the frontend and populates editable content.",
-      "acceptanceCriteria": [
-        "Create-note form offers an explicit selection between manual entry and .txt import",
-        "Selecting a .txt file populates the content field with file contents without requiring a page reload",
-        "User can edit the populated content prior to saving",
-        "Non-.txt files are rejected with a user-visible error message in English"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/utils/txtImport.ts",
-          "operation": "create",
-          "description": "Add helpers to validate .txt selection and read file text via FileReader/Blob.text(), returning English errors for invalid types or read failures. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteFormModal.tsx",
-          "operation": "modify",
-          "description": "Add a UI choice between manual entry and .txt import in create mode; when a .txt file is chosen, read it and populate the content field while keeping it editable; reject non-.txt with an English error. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "summary": "Add optional password-based frontend encryption for note content: store ciphertext only, show ciphertext in cards/detail, and decrypt on-demand with password prompt.",
-      "acceptanceCriteria": [
-        "When encryption is enabled, the UI shows password and confirm password fields and blocks save until they match",
-        "Backend stores ciphertext (not plaintext) when encryption is enabled, and the encryption status is persisted",
-        "In the notes list, encrypted notes show title plus a clearly labeled ciphertext section",
-        "In the note detail modal, encrypted notes show a ciphertext section and provide a password prompt to decrypt for viewing"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/utils/cryptoNotes.ts",
-          "operation": "create",
-          "description": "Implement password-based encrypt/decrypt utilities for note contents performed fully on the frontend (e.g., using Web Crypto); produce ciphertext strings suitable for storage/display and provide clear English error messages on failure. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteFormModal.tsx",
-          "operation": "modify",
-          "description": "Add encryption toggle for create/edit: when enabled, require password + confirmation and block save until they match; encrypt content before calling create/update; store only ciphertext in content and set encrypted flag; show English validation errors. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteCard.tsx",
-          "operation": "modify",
-          "description": "When note.encrypted is true, render a clearly labeled ciphertext section (title + ciphertext preview) in the card instead of plaintext content preview. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteDetailModal.tsx",
-          "operation": "modify",
-          "description": "When note.encrypted is true, show a ciphertext section plus a password prompt to decrypt content locally; only display plaintext content after successful decrypt; keep ciphertext visible as proof of encryption alongside title. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "summary": "Block editing of encrypted notes unless the correct password is provided; without it, fields are not editable and saving is disabled.",
-      "acceptanceCriteria": [
-        "Attempting to edit an encrypted note prompts for password before showing editable fields",
-        "With incorrect/missing password, the edit UI does not allow changing title/content/images and does not allow saving",
-        "With correct password, the note becomes editable and can be saved successfully"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/NoteFormModal.tsx",
-          "operation": "modify",
-          "description": "In edit mode for encrypted notes, require a password step to decrypt before enabling any form inputs (title/content/images) and before enabling save; handle incorrect password with an English error and keep the form locked. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/utils/cryptoNotes.ts",
-          "operation": "modify",
-          "description": "Add a verification/decrypt workflow helper that the edit modal can use to gate editability and avoid partial unlock states; ensure consistent error handling on wrong password. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "summary": "Add real-time client-side search filtering of the locally loaded notes by title or content/ciphertext, with clear-search control.",
-      "acceptanceCriteria": [
-        "Typing in the search field filters visible notes immediately without additional backend calls",
-        "Search matches against both title and content/ciphertext depending on note type",
-        "Clear-search restores the full unfiltered list and clears the input"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/screens/NotesDashboard.tsx",
-          "operation": "modify",
-          "description": "Add a prominent search input that filters the already-loaded notes list as the user types (no additional backend calls); match against title and content (ciphertext for encrypted notes); add clear-search control to reset input and list. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/utils/noteSearch.ts",
-          "operation": "create",
-          "description": "Implement a small utility to normalize text and perform case-insensitive matching across title and content/ciphertext to keep dashboard logic clean. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-11",
-      "summary": "Implement the required UI structure: dashboard with card list + top search, note detail modal, create/edit forms with required behaviors; all text in English.",
-      "acceptanceCriteria": [
-        "Notes list is rendered as clickable cards; clicking opens a modal with full note details",
-        "Create form supports title, content, attachments, import option, and encryption toggle",
-        "Edit form is pre-populated from the selected note and supports updating fields per the rules",
-        "All user-facing text is in English"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/screens/NotesDashboard.tsx",
-          "operation": "modify",
-          "description": "Ensure the dashboard layout matches requirements: search at top, card-based notes list, and accessible create action; include an empty state when there are no notes (with generated illustration wired via REQ-14). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteDetailModal.tsx",
-          "operation": "modify",
-          "description": "Ensure modal close behavior returns to the notes list and preserves expected state; confirm all labels/buttons/errors are in English. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteFormModal.tsx",
-          "operation": "modify",
-          "description": "Ensure create/edit forms include required fields and behaviors (attachments, .txt import option, encryption toggle) and are pre-populated for edits; ensure all copy is English. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Confirm all navigable UI pieces are wired (login -> dashboard; dashboard -> detail modal; detail -> edit modal; create modal) without introducing new top-level routes beyond what the app shell needs. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "summary": "Apply a consistent dark-theme-only design, responsive card layout, and enforce title truncation with always-visible edit/delete controls.",
-      "acceptanceCriteria": [
-        "The app uses a dark palette across all screens, dialogs, and components and does not provide a light theme option",
-        "Long titles in note cards truncate with ellipsis and do not overlap controls",
-        "Edit/delete buttons remain visible and clickable at all viewport sizes",
-        "Spacing/alignment within note cards remains consistent across different title lengths"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "create",
-          "description": "Create global styling entry point to enforce a dark-only theme via CSS variables (shadcn/tailwind tokens) and base element styles; do not provide a light theme toggle; ensure typography defaults suit a notes app. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Force dark mode application-wide (e.g., applying the 'dark' class at the root) and ensure all screens/modals inherit the dark palette. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteCard.tsx",
-          "operation": "modify",
-          "description": "Apply required title truncation (ellipsis) and layout so edit/delete buttons remain fully visible and clickable regardless of title length; ensure responsive card sizing and consistent spacing. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/screens/NotesDashboard.tsx",
-          "operation": "modify",
-          "description": "Adjust notes grid/list responsiveness across breakpoints and container widths to keep card layout consistent on mobile and desktop. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "summary": "Define and apply a coherent dark visual theme (no blue/purple primary accents) consistently across dashboard, forms, and modals.",
-      "acceptanceCriteria": [
-        "A single, consistent theme is applied to dashboard, forms, and modals",
-        "Primary accent color is not blue or purple unless explicitly required by the user (not required here)",
-        "Typography and spacing choices are consistent across screens"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Set a cohesive dark palette and accent color that is not blue/purple by defining shadcn/tailwind CSS variables (e.g., --primary, --accent, --ring) and consistent typography/spacing tokens for the entire app. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteDetailModal.tsx",
-          "operation": "modify",
-          "description": "Align modal styling (surface, borders, typography, spacing) to the shared dark theme tokens and ensure consistency with dashboard and forms. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/NoteFormModal.tsx",
-          "operation": "modify",
-          "description": "Align form controls, validation states, and actions to the shared dark theme tokens and spacing rhythm; ensure consistent styling across create/edit. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "summary": "Add generated static images under frontend/public/assets/generated and render them in the UI (header/empty state) without backend serving.",
-      "acceptanceCriteria": [
-        "Generated images are stored at frontend/public/assets/generated and referenced directly by the frontend",
-        "The app loads and displays the generated images without backend endpoints",
-        "All visible accompanying text remains in English"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/public/assets/generated/notes-logo.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated asset file frontend/public/assets/generated/notes-logo.dim_512x512.png and ensure it is referenced directly by the frontend UI (no backend involvement)."
-        },
-        {
-          "path": "frontend/public/assets/generated/empty-state-illustration.dim_1200x600.png",
-          "operation": "create",
-          "description": "Add the generated asset file frontend/public/assets/generated/empty-state-illustration.dim_1200x600.png and ensure it is referenced directly by the frontend UI (no backend involvement)."
-        },
-        {
-          "path": "frontend/src/screens/NotesDashboard.tsx",
-          "operation": "modify",
-          "description": "Render frontend/public/assets/generated/empty-state-illustration.dim_1200x600.png in the no-notes empty state with English helper text and a create-note call to action. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/screens/LoginScreen.tsx",
-          "operation": "modify",
-          "description": "Render frontend/public/assets/generated/notes-logo.dim_512x512.png on the login screen (and/or app header) to establish branding while keeping the login screen dedicated and minimal. Verify the component's usage instructions before implementing."
+          "description": "Preserve existing protected close logic by ensuring the dialog's onOpenChange continues to ignore close attempts while selectedImage is set, so NoteDetailModal never dismisses as a side-effect of closing the fullscreen preview."
         }
       ]
     }

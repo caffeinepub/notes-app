@@ -58,12 +58,23 @@ export default function NoteDetailModal({ note, onClose, onEdit }: NoteDetailMod
     }
   };
 
+  const handleDialogOpenChange = (open: boolean) => {
+    // Only allow closing the dialog if the fullscreen preview is not open
+    if (!open && !selectedImage) {
+      onClose();
+    }
+  };
+
   const timestamp = new Date(Number(note.timestamp) / 1000000);
 
   return (
     <>
-      <Dialog open onOpenChange={onClose}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <Dialog open onOpenChange={handleDialogOpenChange}>
+        <DialogContent 
+          className={`max-w-3xl max-h-[90vh] overflow-y-auto bg-card border-border ${
+            selectedImage ? 'pointer-events-none' : ''
+          }`}
+        >
           <DialogHeader>
             <DialogTitle className="text-2xl pr-8">{note.title}</DialogTitle>
             <p className="text-sm text-muted-foreground">

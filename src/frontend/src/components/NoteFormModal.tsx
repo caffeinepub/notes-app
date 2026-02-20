@@ -13,11 +13,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Loader2, Upload, X, FileText, Lock, Unlock } from 'lucide-react';
 import { useCreateNote, useUpdateNote } from '../hooks/useNotes';
+import { useActor } from '../hooks/useActor';
 import { toast } from 'sonner';
 import { ExternalBlob } from '../backend';
 import { validateImageFile, createImagePreview } from '../utils/imageAttachments';
 import { readTextFile } from '../utils/txtImport';
 import { encryptContent, decryptContent } from '../utils/cryptoNotes';
+import { safeErrorReason } from '../utils/safeErrorReason';
 import type { Note } from '../backend';
 
 interface NoteFormModalProps {
@@ -29,6 +31,7 @@ export default function NoteFormModal({ note, onClose }: NoteFormModalProps) {
   const isEditing = !!note;
   const createNoteMutation = useCreateNote();
   const updateNoteMutation = useUpdateNote();
+  const { actor, isFetching: actorFetching } = useActor();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -148,6 +151,13 @@ export default function NoteFormModal({ note, onClose }: NoteFormModalProps) {
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
+    // Gate submission on actor readiness
+    if (!actor) {
+      console.error('Submit attempted but actor not available');
+      toast.error('System is still initializing, please wait a moment');
+      return;
+    }
+
     try {
       let finalContent = content;
 
@@ -186,16 +196,26 @@ export default function NoteFormModal({ note, onClose }: NoteFormModalProps) {
 
       onClose();
     } catch (error) {
-      toast.error(isEditing ? 'Failed to update note' : 'Failed to create note');
+      // Log full error to console for diagnostics
+      console.error(isEditing ? 'Update note error:' : 'Create note error:', error);
+      
+      // Show user-friendly error with reason
+      const reason = safeErrorReason(error);
+      const baseMessage = isEditing ? 'Failed to update note' : 'Failed to create note';
+      toast.error(reason ? `${baseMessage}: ${reason}` : baseMessage);
     }
   };
 
   const isSubmitting = createNoteMutation.isPending || updateNoteMutation.isPending;
   const showDecryptStep = isEditing && note?.encrypted && !isDecrypted;
+  
+  // Compute actor readiness - disable submit while actor is initializing
+  const actorReady = !!actor && !actorFetching;
+  const submitDisabled = isSubmitting || !actorReady;
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border" style={{ isolation: 'isolate' }}>
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Edit Note' : 'Create New Note'}</DialogTitle>
         </DialogHeader>
@@ -233,6 +253,13 @@ export default function NoteFormModal({ note, onClose }: NoteFormModalProps) {
           </div>
         ) : (
           <div className="space-y-4 py-4">
+            {!actorReady && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-muted/50 rounded-md text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Initializing system...</span>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
               <Input
@@ -304,17 +331,18 @@ export default function NoteFormModal({ note, onClose }: NoteFormModalProps) {
                   <p className="text-xs text-muted-foreground">Current images:</p>
                   <div className="grid grid-cols-3 gap-2">
                     {existingImages.map((imageRef, index) => (
-                      <div key={index} className="relative aspect-square rounded-md overflow-hidden border border-border group">
+                      <div key={index} className="relative aspect-square rounded-md overflow-hidden border border-border">
                         <img
                           src={imageRef.getDirectURL()}
                           alt={`Existing ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
                         <button
+                          type="button"
                           onClick={() => handleRemoveExistingImage(index)}
-                          className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-1 right-1 p-1 bg-destructive/90 hover:bg-destructive rounded-full transition-colors"
                         >
-                          <X className="h-3 w-3" />
+                          <X className="h-3 w-3 text-destructive-foreground" />
                         </button>
                       </div>
                     ))}
@@ -324,24 +352,25 @@ export default function NoteFormModal({ note, onClose }: NoteFormModalProps) {
 
               {newImagePreviews.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">New images:</p>
+                  <p className="text-xs text-muted-foreground">New images to upload:</p>
                   <div className="grid grid-cols-3 gap-2">
                     {newImagePreviews.map((preview, index) => (
-                      <div key={index} className="relative aspect-square rounded-md overflow-hidden border border-border group">
+                      <div key={index} className="relative aspect-square rounded-md overflow-hidden border border-border">
                         <img
                           src={preview}
                           alt={`New ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
                         <button
+                          type="button"
                           onClick={() => handleRemoveNewImage(index)}
-                          className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-1 right-1 p-1 bg-destructive/90 hover:bg-destructive rounded-full transition-colors"
                         >
-                          <X className="h-3 w-3" />
+                          <X className="h-3 w-3 text-destructive-foreground" />
                         </button>
                         {uploadProgress[index] !== undefined && uploadProgress[index] < 100 && (
                           <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
-                            <p className="text-xs">{uploadProgress[index]}%</p>
+                            <div className="text-xs font-medium">{uploadProgress[index]}%</div>
                           </div>
                         )}
                       </div>
@@ -353,27 +382,30 @@ export default function NoteFormModal({ note, onClose }: NoteFormModalProps) {
               <div>
                 <Input
                   type="file"
-                  accept="image/jpeg,image/png,image/gif"
+                  accept="image/*"
                   multiple
                   onChange={handleImageSelect}
                   className="cursor-pointer"
+                  id="image-upload"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Supported formats: JPEG, PNG, GIF
+                  Max 5MB per image. Supported: JPG, PNG, GIF, WebP
                 </p>
               </div>
             </div>
 
-            <div className="space-y-3 pt-2 border-t border-border">
+            <div className="space-y-4 pt-2 border-t border-border">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="encrypt">Encrypt this note</Label>
+                  <Label htmlFor="encrypt-toggle" className="text-sm font-medium">
+                    Encrypt this note
+                  </Label>
                   <p className="text-xs text-muted-foreground">
                     Protect your note with a password
                   </p>
                 </div>
                 <Switch
-                  id="encrypt"
+                  id="encrypt-toggle"
                   checked={isEncrypted}
                   onCheckedChange={setIsEncrypted}
                   disabled={isEditing}
@@ -381,7 +413,7 @@ export default function NoteFormModal({ note, onClose }: NoteFormModalProps) {
               </div>
 
               {isEncrypted && !isEditing && (
-                <div className="space-y-3 pl-4 border-l-2 border-primary/20">
+                <div className="space-y-3 pl-4 border-l-2 border-primary/30">
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
                     <Input
@@ -426,15 +458,10 @@ export default function NoteFormModal({ note, onClose }: NoteFormModalProps) {
             Cancel
           </Button>
           {!showDecryptStep && (
-            <Button onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isEditing ? 'Updating...' : 'Creating...'}
-                </>
-              ) : (
-                <>{isEditing ? 'Update Note' : 'Create Note'}</>
-              )}
+            <Button onClick={handleSubmit} disabled={submitDisabled}>
+              {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {!actorReady && !isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {isEditing ? 'Update Note' : 'Create Note'}
             </Button>
           )}
         </DialogFooter>
