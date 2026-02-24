@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Encrypted notes app with support for encrypting both text and images together, images hidden until decrypted",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-extend-the-note-encryption-utility-cryptonotes-ts-to-support-encrypting-and-decrypting-image-data-alongside-note-text-when-a-note-is-encrypted-with-a-password-all-attached-images-must-also-be-encrypted-using-the-same-password-and-aes-gcm-key-derivation-pbkdf2-the-encrypted-image-blobs-must-be-stored-in-place-of-the-original-image-data-on-the-backend",
+      "title": "Extend the note encryption utility (cryptoNotes.ts) to support encrypting and decrypting image data alongside note text. When a note is encrypted with a password, all attached images must also be encrypted using the same password and AES-GCM key derivation (PBKDF2). The encrypted image blobs must be stored in place of the original image data on the backend.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-notecard-tsx-when-a-note-is-encrypted-do-not-display-any-image-thumbnails-or-image-count-indicators-the-images-must-remain-fully-hidden-until-the-note-is-decrypted",
+      "title": "In NoteCard.tsx, when a note is encrypted, do not display any image thumbnails or image count indicators. The images must remain fully hidden until the note is decrypted.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-notedetailmodal-tsx-when-an-encrypted-note-is-displayed-before-the-correct-password-is-entered-all-image-thumbnails-must-be-hidden-once-the-user-successfully-decrypts-the-note-by-providing-the-correct-password-decrypt-all-attached-images-using-the-same-password-and-display-them-as-normal-clickable-thumbnails",
+      "title": "In NoteDetailModal.tsx, when an encrypted note is displayed before the correct password is entered, all image thumbnails must be hidden. Once the user successfully decrypts the note by providing the correct password, decrypt all attached images using the same password and display them as normal clickable thumbnails.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-noteformmodal-tsx-when-editing-an-existing-encrypted-note-that-has-been-decrypted-preserve-the-ability-to-add-view-and-remove-images-when-the-note-is-saved-with-a-password-re-encrypt-all-images-including-any-newly-added-ones-before-persisting",
+      "title": "In NoteFormModal.tsx, when editing an existing encrypted note that has been decrypted, preserve the ability to add, view, and remove images. When the note is saved with a password, re-encrypt all images (including any newly added ones) before persisting.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Encrypt images alongside text in notes; images remain hidden until the note is decrypted",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Encrypted Notes",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

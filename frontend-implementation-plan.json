@@ -1,0 +1,72 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Encrypt images alongside note text, hidden until decrypted",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Extend cryptoNotes.ts to support encrypting and decrypting image data using the same password and AES-GCM approach as note text encryption",
+      "acceptanceCriteria": [
+        "When a note is saved with a password, all attached images are encrypted before being stored.",
+        "The encrypted image payloads are persisted to the backend alongside the encrypted note text.",
+        "No plaintext image data is stored or transmitted when encryption is enabled."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/cryptoNotes.ts",
+          "operation": "modify",
+          "description": "Add encryptImage and decryptImage functions that use the same PBKDF2/AES-GCM approach as encryptNote and decryptNote. The functions accept password and image bytes (Uint8Array), returning encrypted/decrypted bytes. Use the same salt/iv generation and key derivation parameters (100000 iterations, SHA-256) for consistency with text encryption."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Hide image thumbnails and image count on NoteCard when the note is encrypted",
+      "acceptanceCriteria": [
+        "Encrypted notes show no image thumbnails on the NoteCard.",
+        "The image count badge is not shown on NoteCard when the note is encrypted.",
+        "A visual indicator (e.g., lock icon) may optionally hint that hidden media exists."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/NoteCard.tsx",
+          "operation": "modify",
+          "description": "Modify the image count badge and thumbnail display logic to check note.encrypted. When encrypted is true, hide the image count badge and any image thumbnails. The lock icon already indicates encryption; no additional media indicator is needed."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Hide images in NoteDetailModal until decryption succeeds, then decrypt and display all images using the same password",
+      "acceptanceCriteria": [
+        "Before decryption, no images are shown in NoteDetailModal.",
+        "After successful decryption with the correct password, all images are decrypted and rendered as thumbnails.",
+        "Decrypted image thumbnails open in the FullScreenImageModal as before.",
+        "If decryption fails (wrong password), images remain hidden and an error is shown."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/NoteDetailModal.tsx",
+          "operation": "modify",
+          "description": "When note.encrypted is true and no decryptedContent exists, hide all image thumbnails. During handleDecrypt, after successfully decrypting the note text, decrypt all note.imageRefs using the decryptImage function from cryptoNotes.ts with the same password. Store the decrypted image bytes in state as an array of Uint8Array and convert them to object URLs for display. If decryption fails, keep images hidden and show the existing error message. Clean up object URLs on unmount or when the modal closes."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "In NoteFormModal, preserve image add/remove/view for decrypted notes and re-encrypt all images (including new ones) on save with password",
+      "acceptanceCriteria": [
+        "When editing a decrypted note in NoteFormModal, existing decrypted images are shown as previews.",
+        "New images can be added or existing ones removed before saving.",
+        "On save with a password, all images (existing and new) are encrypted before being sent to the backend."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/NoteFormModal.tsx",
+          "operation": "modify",
+          "description": "When initializing the form with an existingNote that has decrypted images (from NoteDetailModal state), populate the image preview state with those images. On handleSubmit, if a password is provided, encrypt all attached images using encryptImage from cryptoNotes.ts before converting them to ExternalBlob instances and sending to the backend. Ensure that both newly added images and existing decrypted images are encrypted with the same password before save."
+        }
+      ]
+    }
+  ]
+}

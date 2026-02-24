@@ -1,0 +1,97 @@
+{
+  "kind": "build_request",
+  "title": "Encrypt images alongside note text, hidden until decrypted",
+  "projectName": "Encrypted Notes",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Extend the note encryption utility (cryptoNotes.ts) to support encrypting and decrypting image data alongside note text. When a note is encrypted with a password, all attached images must also be encrypted using the same password and AES-GCM key derivation (PBKDF2). The encrypted image blobs must be stored in place of the original image data on the backend.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "encrypt images too",
+          "They are hidden until they are decrypted along with the text"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When a note is saved with a password, all attached images are encrypted before being stored.",
+        "The encrypted image payloads are persisted to the backend alongside the encrypted note text.",
+        "No plaintext image data is stored or transmitted when encryption is enabled."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "In NoteCard.tsx, when a note is encrypted, do not display any image thumbnails or image count indicators. The images must remain fully hidden until the note is decrypted.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "They are hidden until they are decrypted along with the text"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Encrypted notes show no image thumbnails on the NoteCard.",
+        "The image count badge is not shown on NoteCard when the note is encrypted.",
+        "A visual indicator (e.g., lock icon) may optionally hint that hidden media exists."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "In NoteDetailModal.tsx, when an encrypted note is displayed before the correct password is entered, all image thumbnails must be hidden. Once the user successfully decrypts the note by providing the correct password, decrypt all attached images using the same password and display them as normal clickable thumbnails.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "They are hidden until they are decrypted along with the text"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Before decryption, no images are shown in NoteDetailModal.",
+        "After successful decryption with the correct password, all images are decrypted and rendered as thumbnails.",
+        "Decrypted image thumbnails open in the FullScreenImageModal as before.",
+        "If decryption fails (wrong password), images remain hidden and an error is shown."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "In NoteFormModal.tsx, when editing an existing encrypted note that has been decrypted, preserve the ability to add, view, and remove images. When the note is saved with a password, re-encrypt all images (including any newly added ones) before persisting.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "encrypt images too"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When editing a decrypted note in NoteFormModal, existing decrypted images are shown as previews.",
+        "New images can be added or existing ones removed before saving.",
+        "On save with a password, all images (existing and new) are encrypted before being sent to the backend."
+      ]
+    }
+  ],
+  "constraints": [
+    "Use the same password and PBKDF2/AES-GCM approach already established in cryptoNotes.ts for image encryption.",
+    "Do not change the backend data model unless required to store encrypted image blobs — if the backend already stores raw blob arrays, reuse that storage without schema changes.",
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
+  ],
+  "nonGoals": [
+    "Encrypting notes with a different algorithm or key derivation scheme than what is already used.",
+    "Adding per-image passwords — all images in a note share the same password as the note text.",
+    "Encrypting note metadata such as title or timestamps.",
+    "Any backend changes beyond what is strictly necessary to store encrypted image payloads."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

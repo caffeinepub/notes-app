@@ -1,0 +1,85 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-extend-the-note-encryption-utility-cryptonotes-ts-to-support-encrypting-and-decrypting-image-data-alongside-note-text-when-a-note-is-encrypted-with-a-password-all-attached-images-must-also-be-encrypted-using-the-same-password-and-aes-gcm-key-derivation-pbkdf2-the-encrypted-image-blobs-must-be-stored-in-place-of-the-original-image-data-on-the-backend",
+      "featureTitle": "Extend the note encryption utility (cryptoNotes.ts) to support encrypting and decrypting image data alongside note text. When a note is encrypted with a password, all attached images must also be encrypted using the same password and AES-GCM key derivation (PBKDF2). The encrypted image blobs must be stored in place of the original image data on the backend.",
+      "files": [
+        "frontend/src/utils/cryptoNotes.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-notecard-tsx-when-a-note-is-encrypted-do-not-display-any-image-thumbnails-or-image-count-indicators-the-images-must-remain-fully-hidden-until-the-note-is-decrypted",
+      "featureTitle": "In NoteCard.tsx, when a note is encrypted, do not display any image thumbnails or image count indicators. The images must remain fully hidden until the note is decrypted.",
+      "files": [
+        "frontend/src/components/NoteCard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-notedetailmodal-tsx-when-an-encrypted-note-is-displayed-before-the-correct-password-is-entered-all-image-thumbnails-must-be-hidden-once-the-user-successfully-decrypts-the-note-by-providing-the-correct-password-decrypt-all-attached-images-using-the-same-password-and-display-them-as-normal-clickable-thumbnails",
+      "featureTitle": "In NoteDetailModal.tsx, when an encrypted note is displayed before the correct password is entered, all image thumbnails must be hidden. Once the user successfully decrypts the note by providing the correct password, decrypt all attached images using the same password and display them as normal clickable thumbnails.",
+      "files": [
+        "frontend/src/components/NoteDetailModal.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-noteformmodal-tsx-when-editing-an-existing-encrypted-note-that-has-been-decrypted-preserve-the-ability-to-add-view-and-remove-images-when-the-note-is-saved-with-a-password-re-encrypt-all-images-including-any-newly-added-ones-before-persisting",
+      "featureTitle": "In NoteFormModal.tsx, when editing an existing encrypted note that has been decrypted, preserve the ability to add, view, and remove images. When the note is saved with a password, re-encrypt all images (including any newly added ones) before persisting.",
+      "files": [
+        "frontend/src/components/NoteFormModal.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

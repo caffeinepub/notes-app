@@ -1,0 +1,74 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-24T21:27:39.701Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 4,
+    "implemented": 4,
+    "items": [
+      {
+        "id": "REQ-1",
+        "summary": "Extend the note encryption utility (cryptoNotes.ts) to support encrypting and decrypting image data alongside note text. When a note is encrypted with a password, all attached images must also be encrypted using the same password and AES-GCM key derivation (PBKDF2). The encrypted image blobs must be stored in place of the original image data on the backend.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/utils/cryptoNotes.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/utils/cryptoNotes.ts"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "In NoteCard.tsx, when a note is encrypted, do not display any image thumbnails or image count indicators. The images must remain fully hidden until the note is decrypted.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/NoteCard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/NoteCard.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "In NoteDetailModal.tsx, when an encrypted note is displayed before the correct password is entered, all image thumbnails must be hidden. Once the user successfully decrypts the note by providing the correct password, decrypt all attached images using the same password and display them as normal clickable thumbnails.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/NoteDetailModal.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/NoteDetailModal.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "In NoteFormModal.tsx, when editing an existing encrypted note that has been decrypted, preserve the ability to add, view, and remove images. When the note is saved with a password, re-encrypt all images (including any newly added ones) before persisting.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/NoteFormModal.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/NoteFormModal.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/components/NoteCard.tsx",
+    "frontend/src/components/NoteDetailModal.tsx",
+    "frontend/src/components/NoteFormModal.tsx",
+    "frontend/src/screens/NotesDashboard.tsx",
+    "frontend/src/utils/cryptoNotes.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

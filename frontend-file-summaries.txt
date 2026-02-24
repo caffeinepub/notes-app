@@ -1,0 +1,19 @@
+{
+  "frontend/src/App.tsx": "Main application component that enforces Internet Identity authentication, manages user profile setup, and renders either the login screen or notes dashboard with dark mode forced.",
+  "frontend/src/screens/LoginScreen.tsx": "Dedicated login screen with branding logo and Internet Identity sign-in button.",
+  "frontend/src/screens/NotesDashboard.tsx": "Main dashboard managing notes grid, search, and modal state; updated `EditState.decryptedImages` and `handleEditFromDetail` parameter type from `Uint8Array[]` to `Uint8Array<ArrayBuffer>[]` to match the concrete buffer type expected by `NoteFormModal`.",
+  "frontend/src/components/NoteCard.tsx": "Clickable note card showing title, content preview (or ciphertext for encrypted notes), timestamp, and edit/delete buttons; image count badge is now hidden for encrypted notes since images are concealed until decryption.",
+  "frontend/src/components/NoteDetailModal.tsx": "Full note detail modal with decryption UI; updated to use `Uint8Array<ArrayBuffer>` types throughout so decrypted image bytes are correctly typed for `Blob` construction and passing to the edit handler.",
+  "frontend/src/components/NoteFormModal.tsx": "Create/edit note form modal with image encryption support; updated all `Uint8Array` usages to `Uint8Array<ArrayBuffer>` and added explicit `as Uint8Array<ArrayBuffer>` casts when reading from `file.arrayBuffer()`, ensuring compatibility with `ExternalBlob.fromBytes` and `Blob` constructor type requirements.",
+  "frontend/src/components/FullScreenImageModal.tsx": "Full-screen image viewer modal rendered in a portal at z-index 200 with explicit pointer event handling, stopImmediatePropagation on Escape key, type=\"button\" on close button, and comprehensive event isolation to prevent click-through to underlying layers.",
+  "frontend/src/components/ProfileSetupModal.tsx": "First-login modal to capture user's name for profile creation, using showCloseButton={false} to prevent dismissal.",
+  "frontend/src/hooks/useUserProfile.ts": "React Query hooks for fetching and saving user profile with proper actor dependency handling to prevent modal flash.",
+  "frontend/src/hooks/useNotes.ts": "React Query hooks for all note CRUD operations (list, get, create, update, delete) with automatic cache invalidation and mutation-level error logging for diagnostics.",
+  "frontend/src/utils/imageAttachments.ts": "Utilities for validating image file types/sizes and creating preview URLs for selected images.",
+  "frontend/src/utils/txtImport.ts": "Utility to read and validate .txt file contents for note content import.",
+  "frontend/src/utils/cryptoNotes.ts": "Password-based AES-GCM encryption/decryption utilities using PBKDF2 key derivation; adds a `toConcreteUint8Array` helper to ensure all `Uint8Array` values have a concrete `ArrayBuffer` (not `SharedArrayBuffer`) before passing to Web Crypto API or `Blob` constructor, fixing TypeScript strict buffer type errors.",
+  "frontend/src/utils/noteSearch.ts": "Client-side note filtering utility for real-time search by title or content.",
+  "frontend/src/index.css": "Global styles with dark-only OKLCH color system using teal/cyan accent (avoiding blue/purple) and Inter font family.",
+  "frontend/tailwind.config.js": "Tailwind configuration with Inter font family and extended color tokens matching the dark theme design system.",
+  "frontend/src/utils/safeErrorReason.ts": "Utility function that extracts safe, UI-friendly error messages from unknown error objects, normalizing common patterns like \"Actor not available\" and authorization errors without exposing stack traces."
+}
